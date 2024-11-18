@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mairajuddeen - Cyber Investigator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #00ff00;
+            --secondary-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #1a73e8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: rgba(0, 255, 0, 0.1);
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-around;
+            width: 60%;
+        }
+
+        .nav-links li {
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-color);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+        }
+
+        .hamburger .line {
+            width: 30px;
+            height: 3px;
+            background-color: var(--primary-color);
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5') no-repeat center center/cover;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-color), transparent);
+            opacity: 0.3;
+            animation: gradientAnimation 10s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            min-height: 80px;
+        }
+
+        .changing-text {
+            border-right: 0.15em solid var(--primary-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: 0.15em;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary-color) }
+        }
+
+        .section {
+            padding: 100px 0;
+        }
+
+        h2 {
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .about-content, .achievements-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .about-item, .achievement-item {
+            flex-basis: calc(50% - 20px);
+            margin-bottom: 40px;
+            background-color: rgba(0, 255, 0, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .about-item:hover, .achievement-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .about-item i, .achievement-item i {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .skill-item {
+            background-color: rgba(0, 255, 0, 0.1);
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 30px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .contact {
+            text-align: center;
+            background-color: rgba(0, 255, 0, 0.05);
+            padding: 60px 0;
+            border-radius: 10px;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            margin: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: scale(1.1);
+        }
+
+        .contact-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .contact-button:hover {
+            background-color: var(--text-color);
+            color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .social-icons {
+            margin-top: 30px;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            margin: 0 15px;
+            font-size: 24px;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--text-color);
+            transform: translateY(-5px);
+        }
+
+        .visitors {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 18px;
+        }
+
+        footer {
+            background-color: rgba(0, 255, 0, 0.1);
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .projects {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background-color: rgba(0, 255, 0, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .project-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        #cyber-attack-map {
+            width: 100%;
+            height: 500px;
+            background-color: #000;
+            margin-top: 40px;
+        }
+
+        .country {
+            fill: #2C3E50;
+            stroke: #000;
+            stroke-width: 0.5px;
+        }
+
+        .attack-line {
+            fill: none;
+            stroke: #ff0000;
+            stroke-width: 2px;
+        }
+
+        .attack-point {
+            fill: #ff0000;
+        }
+
+        @media screen and (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                right: -100%;
+                top: 70px;
+                background-color: rgba(0, 0, 0, 0.9);
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                transition: 0.5s;
+                padding: 20px 0;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                margin: 15px 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            h2 {
+                font-size: 28px;
+            }
+
+            .about-item, .achievement-item {
+                flex-basis: 100%;
+            }
+
+            .skill-item {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">James Gichia</div>
+            <div class="hamburger">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#achievements">Achievements</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1><span class="changing-text"></span></h1>
+            <p> Hacker | Investigator | Artist </p>
+            <p>"Infiltrate. Secure. Innovate. Repeat."</p>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <div class="container">
+            <h2>About Me</h2>
+            <div class="about-content">
+                <div class="about-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <p>A visionary cyber security expert with an unparalleled passion for the digital arts, music, and literature.</p>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-users"></i>
+                    <p>Dedicated to fostering teamwork and spreading a message of peace and resilience in the digital realm.</p>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-tree"></i>
+                    <p>An ardent advocate for environmental conservation, bridging the gap between technology and nature.</p>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-flag"></i>
+                    <p>Driven by an unwavering commitment to elevate our nation's technological prowess on the global stage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="achievements" class="section">
+        <div class="container">
+            <h2>Noteworthy Accomplishments</h2>
+            <div class="achievements-content">
+                <div class="achievement-item">
+                    <i class="fas fa-music"></i>
+                    <p>Showcased talent in two prestigious country music performances</p>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-university"></i>
+                    <p>Spearheaded multiple high-profile events at Mama Ngina University</p>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-microphone"></i>
+                    <p>Orchestrated the Kenya Bass Singers Competition</p>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-star"></i>
+                    <p>Former Google DSC Security Lead, driving innovation in cyber security</p>
+                </div>
+                <div class="achievement-item">
+                    <i class="fab fa-microsoft"></i>
+                    <p>Microsoft Campus Ambassador, bridging academia and industry</p>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-users"></i>
+                    <p>President of Microsoft Learn Community at Mama Ngina University</p>
+                </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="section">
+        <div class="container">
+            <h2>Technical Expertise</h2>
+            <div class="skills">
+                <div class="skill-item">Network Architecture</div>
+                <div class="skill-item">BurpSuite</div>
+                <div class="skill-item">WireShark</div>
+                <div class="skill-item">Nessus</div>
+                <div class="skill-item">Snort</div>
+                <div class="skill-item">Nmap</div>
+                <div class="skill-item">Kali Linux</div>
+                <div class="skill-item">Windows Security</div>
+                <div class="skill-item">macOS Hardening</div>
+                <div class="skill-item">Ethical Hacking</div>
+                <div class="skill-item">Web Application Pentesting</div>
+                <div class="skill-item">Security Auditing</div>
+                <div class="skill-item">Vulnerability Assessment</div>
+                <div class="skill-item">Incident Response</div>
+                <div class="skill-item">Cryptography</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="section projects">
+        <div class="container">
+            <h2>Featured Projects</h2>
+            <div class="project-grid">
+                <div class="project-card">
+                    <h3>Secure Network Architecture</h3>
+                    <p>Designed and implemented a robust network security infrastructure for a Fortune 500 company.</p>
+                </div>
+                <div class="project-card">
+                    <h3>Ethical Hacking Workshop</h3>
+                    <p>Conducted a series of workshops training over 1000 students in ethical hacking techniques.</p>
+                </div>
+                <div class="project-card">
+                    <h3>Cyber Threat Intelligence Platform</h3>
+                    <p>Developed an AI-driven platform for real-time cyber threat detection and analysis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cyber-attack-map-section" class="section">
+        <div class="container">
+            <h2>Real-Time Cyber Threat Map</h2>
+            <div id="cyber-attack-map"></div>
+        </div>
+    </section>
+
+    <section id="contact" class="section contact">
+        <div class="container">
+            <h2>Get in Touch</h2>
+            <p>Ready to collaborate or have any questions? Feel free to reach out!</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <p>jamesgichia15@gmail.com</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <p>+254 791326693</p>
+                </div>
+            </div>
+            <a href="mailto:jamesgichia15@gmail.com" class="contact-button">Send Email</a>
+            <a href="tel:+254791326693" class="contact-button">Call Now</a>
+            <div class="social-icons">
+                <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="visitors">
+            <p>Visitors: <span id="visitor-count">10234</span></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 James Gichia. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const changingText = document.querySelector('.changing-text');
+        const texts = ['Ethical Hacker', 'Artist', 'Musician', 'Researcher', 'Innovator', 'Tech-Geek'];
+        let textIndex = 0;
+        let charIndex = 0;
+
+        function type() {
+            if (charIndex < texts[textIndex].length) {
+                changingText.textContent += texts[textIndex].charAt(charIndex);
+                charIndex++;
+                setTimeout(type, 100);
+            } else {
+                setTimeout(erase, 2000);
+            }
+        }
+
+        function erase() {
+            if (charIndex > 0) {
+                changingText.textContent = texts[textIndex].substring(0, charIndex - 1);
+                charIndex--;
+                setTimeout(erase, 50);
+            } else {
+                textIndex = (textIndex + 1) % texts.length;
+                setTimeout(type, 500);
+            }
+        }
+
+        async function updateVisitorCount() {
+            try {
+                const response = await fetch('/.netlify/functions/visitorCounter');
+                const data = await response.json();
+                animateVisitorCount(data.count, document.getElementById('visitor-count'));
+            } catch (error) {
+                console.error('Failed to update visitor count:', error);
+            }
+        }
+
+        function animateVisitorCount(target, element) {
+            let start = Math.max(0, target - 10);
+            let current = start;
+            const increment = 1;
+            const stepTime = 100;
+
+            function step() {
+                current += increment;
+                element.textContent = current;
+                if (current < target) {
+                    setTimeout(step, stepTime);
+                }
+            }
+
+            setTimeout(step, stepTime);
+        }
+
+        function createCyberAttackMap() {
+            const width = document.getElementById('cyber-attack-map').clientWidth;
+            const height = 500;
+
+            const svg = d3.select("#cyber-attack-map")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            const projection = d3.geoMercator()
+                .scale(width / 6.3)
+                .translate([width / 2, height / 1.6]);
+
+            const path = d3.geoPath().projection(projection);
+
+            d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(function(world) {
+                svg.selectAll("path")
+                    .data(topojson.feature(world, world.objects.countries).features)
+                    .enter().append("path")
+                    .attr("class", "country")
+                    .attr("d", path);
+
+                function simulateAttack() {
+                    const source = [Math.random() * 360 - 180, Math.random() * 180 - 90];
+                    const target = [Math.random() * 360 - 180, Math.random() * 180 - 90];
+
+                    const sourceXY = projection(source);
+                    const targetXY = projection(target);
+
+                    const attack = svg.append("line")
+                        .attr("class", "attack-line")
+                        .attr("x1", sourceXY[0])
+                        .attr("y1", sourceXY[1])
+                        .attr("x2", sourceXY[0])
+                        .attr("y2", sourceXY[1]);
+
+                    attack.transition()
+                        .duration(2000)
+                        .attr("x2", targetXY[0])
+                        .attr("y2", targetXY[1])
+                        .remove();
+
+                    svg.append("circle")
+                        .attr("class", "attack-point")
+                        .attr("cx", targetXY[0])
+                        .attr("cy", targetXY[1])
+                        .attr("r", 3)
+                        .transition()
+                        .duration(1000)
+                        .attr("r", 0)
+                        .remove();
+                }
+
+                setInterval(simulateAttack, 200);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(type, 500);
+            updateVisitorCount();
+            createCyberAttackMap();
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Hamburger menu functionality
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+
+            // Close menu when a link is clicked
+            document.querySelectorAll('.nav-links li').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+                
